@@ -1,0 +1,23 @@
+<html>
+  <head>
+  <title>APP</title>
+  </head>
+  <body>
+    <div id="processOrder">
+      <h2>process an order</h2>
+      <form action="/processOrder" method="post">
+          Order Name:<input type="text" name="ordername">
+          Customer ID:<input type="text" name="customerid">
+          <input type="submit" value="Process">
+      </form>
+    </div>
+    <div id="getOrderStatus">
+    <h2>Get an order's status</h2>
+      <form action="/getOrderStatus" method="get">
+        Order Name:<input type="text" name="ordername">
+        <input type="submit" value="Check">
+      </form>
+      <div>{{printf "%s" .OrderState}}</div>
+    </div>
+  </body>
+</html>
