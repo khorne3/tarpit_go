@@ -15,9 +15,9 @@ var (
 	pwd        = "mysql"
 	host       = "127.0.0.1"
 	port       = "3306"
-	dbname     = "DBPROD4"
+	dbname     = "DBPROD"
 	tablename  = "product"
-	usertable  = "usertable"
+	usertable  = "user"
 )
 
 func getConnection() *sql.DB {
@@ -36,17 +36,15 @@ func getConnection() *sql.DB {
 }
 
 func dbExec(sql string) bool {
-	if connection == nil {
-		connection = getConnection()
-	}
+	log.Println(sql)
+	connection = getConnection()
 
 	stmt, err := connection.Prepare(sql)
 	if err != nil {
 		log.Println(err.Error())
 		return false
 	}
-
-	_, err = stmt.Exec(sql)
+	_, err = stmt.Exec()
 	if err != nil {
 		log.Println(err.Error())
 		return false
@@ -55,9 +53,8 @@ func dbExec(sql string) bool {
 }
 
 func dbQuery(sql string) *sql.Rows {
-	if connection == nil {
-		connection = getConnection()
-	}
+	log.Println(sql)
+	connection = getConnection()
 	row, err := connection.Query(sql)
 
 	if err != nil {
@@ -100,7 +97,6 @@ func dbinitHandler(w http.ResponseWriter, r *http.Request) {
 
 		// create product table
 		ctable := fmt.Sprintf("CREATE Table %s(orderId int NOT NULL AUTO_INCREMENT, custId varchar(50), orderName varchar(30), orderState int,PRIMARY KEY (orderId));", tablename)
-		log.Println(ctable)
 		if dbExec(ctable) {
 			log.Printf("Table %s created", tablename)
 		}
@@ -111,7 +107,7 @@ func dbinitHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Table %s created", usertable)
 		}
 		// Insert admin user
-		initUser := fmt.Sprintf("INSERT INTO %s (username, password, role) VALUES (\"%s\", \"%s\", 0)", "admin", "1234")
+		initUser := fmt.Sprintf("INSERT INTO %s (username, password, role) VALUES (\"%s\", \"%s\", 0)", usertable, "admin", "1234")
 
 		if dbExec(initUser) {
 			log.Println("Admin user created")
@@ -119,4 +115,5 @@ func dbinitHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/login", http.StatusFound)
 	defer db.Close()
+	connection = nil
 }

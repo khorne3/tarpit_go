@@ -9,6 +9,11 @@ import (
 
 type resValue struct {
 	OrderState string
+	Profile    string
+}
+type outputList struct {
+	Name    []string
+	Command string
 }
 
 var rv resValue
@@ -28,6 +33,7 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err.Error())
 		} else {
 			rv.OrderState = ""
+			rv.Profile = ""
 			t.Execute(w, rv)
 		}
 	}
@@ -44,7 +50,7 @@ func processHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			connection = getConnection()
-			sql := fmt.Sprintf("SELECT orderState from %s where orderName=\"%s\";", tablename, orderName)
+			sql := fmt.Sprintf("SELECT orderState FROM %s WHERE orderName=\"%s\";", tablename, orderName)
 			log.Println(sql)
 			if connection == nil {
 				log.Println("db connection is null")
@@ -132,4 +138,48 @@ func statusHandler(w http.ResponseWriter, r *http.Request) {
 func initHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("view/init.html")
 	t.Execute(w, nil)
+}
+
+// /profile
+func proHandler(w http.ResponseWriter, r *http.Request) {
+	if checkAuth(w, r) && (r.Method == "GET") {
+		t, _ := template.ParseFiles("view/profile.html")
+		t.Execute(w, rv)
+	} else {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+}
+
+// /setprofile
+func setproHandler(w http.ResponseWriter, r *http.Request) {
+	if checkAuth(w, r) && (r.Method == "GET") {
+		q := r.URL.Query()
+		imagename := q.Get("image")
+		rv.Profile = "image/" + imagename
+		t, _ := template.ParseFiles("view/profile.html")
+		t.Execute(w, rv)
+	} else {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+}
+
+// /listdemo
+func listdemoHandler(w http.ResponseWriter, r *http.Request) {
+	// log.Println("listdemo")
+	// files, err := ioutil.ReadDir("./demo")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	var ol outputList
+	ol.Name = make([]string, 0, 1)
+	ol.Command = "ls -a"
+	// for _, f := range files {
+	// 	log.Println(f.Name())
+	// 	fl.Name = append(fl.Name, f.Name())
+	// }
+	t, err := template.ParseFiles("view/playground.html")
+	if err != nil {
+		log.Fatal(err)
+	}
+	t.Execute(w, ol)
 }

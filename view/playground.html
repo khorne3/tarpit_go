@@ -1,0 +1,21 @@
+<html>
+  <head>
+  <title>Playground</title>
+  </head>
+  <body>
+    <h3>Remote code execution</h3>
+    <textarea readonly rows="20" cols="60">
+        {{range .Name}}
+          {{.}}
+        {{end}}
+    </textarea>
+    <form action="/exec" method="post">
+        command: <input type="text" name="cmd" value={{.Command}}>
+        <input type="submit" value="submit">
+    </form>
+  </body>
+  <br/>
+  <div>
+      <a href="/login">back</a>
+    </div>
+</html>

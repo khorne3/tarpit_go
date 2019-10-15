@@ -1,20 +1,13 @@
 <html>
   <head>
-  <title>Login</title>
+  <title>Vulns</title>
   </head>
   <body>
     <h3>Please Sign In.</h3>
     <form action="/login" method="post">
         Username:<input type="text" name="username" value="admin">
-        Password:<input type="text" name="password" value="1234">
+        Password:<input type="text" name="password" value='12346" OR ""= "'>
         <input type="submit" value="Login">
     </form>
   </body>
-  <br/>
-  <div>
-      <a href="/vulns">sql injection demo</a>
-  </div>
-  <div>
-      <a href="/listdemo">remote code execution demo</a>
-  </div>
 </html>

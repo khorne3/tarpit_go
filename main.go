@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
@@ -13,6 +14,7 @@ func main() {
 	http.Handle("/", rtr)
 
 	// routes
+	rtr.HandleFunc("/", loginHandler)
 	rtr.HandleFunc("/login", loginHandler)
 	rtr.HandleFunc("/logout", logoutHandler)
 	rtr.HandleFunc("/processOrder", processHandler)
@@ -21,8 +23,17 @@ func main() {
 	rtr.HandleFunc("/init", initHandler)
 	rtr.HandleFunc("/dbinit", dbinitHandler)
 	//rtr.HandleFunc("/FileUploader", servicesHandler)
-	// rtr.HandleFunc("/vulns", resourcesHandler)
-	// rtr.HandleFunc("/insider", newResourceHandler)
+	rtr.HandleFunc("/vulns", vulnsHandler)
+	rtr.HandleFunc("/profile", proHandler)
+	//rtr.HandleFunc("/insider", insiderHandler)
+	rtr.HandleFunc("/setprofile", setproHandler)
+	rtr.HandleFunc("/traversal", traversalHandler)
+	rtr.HandleFunc("/exec", execHandler)
+	rtr.HandleFunc("/listdemo", listdemoHandler)
+
+	HomeFolder, _ := os.Getwd()
+	rtr.PathPrefix("/image/").Handler(http.StripPrefix("/image/", http.FileServer(http.Dir(HomeFolder+"/image/"))))
+	rtr.PathPrefix("/demo/").Handler(http.StripPrefix("/demo/", http.FileServer(http.Dir(HomeFolder+"/demo/"))))
 
 	// listen to the web request
 	log.Println("Listening...")

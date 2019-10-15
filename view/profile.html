@@ -1,0 +1,24 @@
+<html>
+  <head>
+  <title>Profile</title>
+  </head>
+  <body>
+    <h3>Set profile</h3>
+    <form action="/setprofile" method="get">
+        Select profile:<input type="text" name="image" value="image1.png">
+        <input type="submit" value="select">
+    </form>
+    <div><img src={{.Profile}} alt="profile" width="50" height="60" ></div>
+    <div><a href={{.Profile}}>{{printf "%s" .Profile}}</a></div>
+    <br/>
+    <div>
+            <a href="/traversal">Directory traversal demo</a>
+    </div>
+    <div>
+            <a href="/app">Back</a>
+    </div>
+    <div>
+    <a href="/logout">Logout</a>
+    </div>
+  </body>
+</html>

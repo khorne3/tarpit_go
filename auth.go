@@ -1,14 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
-)
-
-// AUTHUSER AUTHPW
-const (
-	AUTHUSER = "User"
-	AUTHPW   = "1234"
 )
 
 var (
@@ -40,11 +35,21 @@ func enforcer(w http.ResponseWriter, r *http.Request, authed bool) {
 // eventually modify this method to call out to authentication service
 func authCheck(w http.ResponseWriter, r *http.Request) {
 	user := r.FormValue("username")
-	pw := r.FormValue("password")
-	if (user == AUTHUSER) && (pw == AUTHPW) {
+	pwd := r.FormValue("password")
+	if checkUser(user, pwd) {
 		authenticated = true
 		http.Redirect(w, r, "/app", http.StatusFound)
 	} else {
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
+}
+
+func checkUser(user string, pwd string) bool {
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE username = \"%s\" AND password = \"%s\";", usertable, user, pwd)
+	row := dbQuery(sql)
+	defer row.Close()
+	if row.Next() {
+		return true
+	}
+	return false
 }
