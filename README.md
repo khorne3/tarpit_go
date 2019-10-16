@@ -1,4 +1,4 @@
-Start environment:
+**Demo steps**
 1. start containers:
 cd <tarpit_go>
 docker-compose up
@@ -15,10 +15,7 @@ curl -X GET http://localhost:3000/dbinit
 control + C
 docker-compose down
 
-/***
-* console version
-**/
-
+**curl version**
 Sql injection demo: 
 //password='12346" OR ""="'
 curl -X POST -d "username=admin&password=12346%22+OR+%22%22%3D+%22" http://localhost:3000/login
