@@ -40,7 +40,7 @@ func authCheck(w http.ResponseWriter, r *http.Request) {
 		authenticated = true
 		http.Redirect(w, r, "/app", http.StatusFound)
 	} else {
-		http.Redirect(w, r, "/login", http.StatusFound)
+		http.Error(w, "User is not exist or password is not correct", http.StatusForbidden)
 	}
 }
 
