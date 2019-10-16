@@ -13,7 +13,7 @@ var (
 	connection *sql.DB
 	user       = "root"
 	pwd        = "mysql"
-	host       = "127.0.0.1"
+	host       = "mysql"
 	port       = "3306"
 	dbname     = "DBPROD"
 	tablename  = "product"
@@ -67,18 +67,27 @@ func dbQuery(sql string) *sql.Rows {
 
 //Just for demo
 func dbinitHandler(w http.ResponseWriter, r *http.Request) {
-	user = r.FormValue("user")
-	pwd = r.FormValue("pwd")
-	host = r.FormValue("host")
-	port = r.FormValue("port")
+	if r.Method == "POST" {
+		user = r.FormValue("user")
+		pwd = r.FormValue("pwd")
+		host = r.FormValue("host")
+		port = r.FormValue("port")
+	}
+	log.Println("print host")
+	log.Println(r.FormValue("host"))
+	log.Println(host)
+	log.Println(r.Method)
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", user, pwd, host, port)
+	log.Println(dsn)
+
 	db, err := sql.Open("mysql", dsn)
 
 	if err != nil {
 		log.Printf("init db failed %s \n", err.Error())
 	} else {
 		cdb := fmt.Sprintf("CREATE DATABASE %s;", dbname)
+		log.Println(cdb)
 		_, err = db.Exec(cdb)
 		if err != nil {
 			log.Println(err.Error())
