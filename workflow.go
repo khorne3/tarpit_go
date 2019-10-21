@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -42,13 +43,24 @@ func appHandler(w http.ResponseWriter, r *http.Request) {
 // /processOrder
 func processHandler(w http.ResponseWriter, r *http.Request) {
 	if checkAuth(w, r) {
-		if r.Method == "POST" {
-			orderName := r.FormValue("ordername")
-			customerid := r.FormValue("customerid")
+		if r.Method == "GET" {
+			q := r.URL.Query()
+			orderName := q.Get("ordername")
+			customerid := q.Get("customerid")
 			if len(orderName) == 0 {
 				http.Error(w, "missing ordername", http.StatusBadRequest)
 				return
 			}
+
+			order := Order{OrderName: orderName, CustomerID: customerid}
+
+			oen, err := order.gobEncode()
+			if err != nil {
+				log.Println(err)
+			} else {
+				log.Println(oen)
+			}
+
 			connection = getConnection()
 			sql := fmt.Sprintf("SELECT orderState FROM %s WHERE orderName=\"%s\";", tablename, orderName)
 			log.Println(sql)
@@ -84,6 +96,20 @@ func processHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Println(err.Error())
 			}
+		}
+		if r.Method == "POST" {
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				log.Printf("Error reading body: %v", err)
+				http.Error(w, "can't read body", http.StatusBadRequest)
+				return
+			}
+			var order Order
+			err = order.gobDecode(body)
+			if err == nil {
+				log.Println(err)
+			}
+			log.Println(order)
 		}
 		http.Redirect(w, r, "/app", http.StatusFound)
 	}

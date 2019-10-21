@@ -30,6 +30,7 @@ func main() {
 	rtr.HandleFunc("/traversal", traversalHandler)
 	rtr.HandleFunc("/listdemo", listdemoHandler)
 	rtr.HandleFunc("/exec", execHandler)
+	rtr.HandleFunc("/insider", insiderHandler)
 
 	HomeFolder, _ := os.Getwd()
 	rtr.PathPrefix("/image/").Handler(http.StripPrefix("/image/", http.FileServer(http.Dir(HomeFolder+"/image/"))))

