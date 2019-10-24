@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"net/http"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -66,58 +66,60 @@ func dbQuery(sql string) *sql.Rows {
 }
 
 //Just for demo
-func dbinitHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		user = r.FormValue("user")
-		pwd = r.FormValue("pwd")
-		host = r.FormValue("host")
-		port = r.FormValue("port")
-	}
+func dbinit() {
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/", user, pwd, host, port)
 	log.Println(dsn)
 
+	timer1 := time.NewTimer(15 * time.Second)
+	<-timer1.C
+
 	db, err := sql.Open("mysql", dsn)
-
 	if err != nil {
-		log.Printf("init db failed %s \n", err.Error())
-	} else {
-		cdb := fmt.Sprintf("CREATE DATABASE %s;", dbname)
-		log.Println(cdb)
-		_, err = db.Exec(cdb)
-		if err != nil {
-			log.Println(err.Error())
-		}
-
-		log.Println("Successfully created database")
-		udb := fmt.Sprintf("use %s;", dbname)
-		_, err = db.Exec(udb)
-		if err != nil {
-			log.Println(err.Error())
-			return
-		}
-		log.Printf("Switch to db %s \n", dbname)
-
-		connection = db
-
-		// create product table
-		ctable := fmt.Sprintf("CREATE Table %s(orderId int NOT NULL AUTO_INCREMENT, custId varchar(50), orderName varchar(30), orderState int,PRIMARY KEY (orderId));", tablename)
-		if dbExec(ctable) {
-			log.Printf("Table %s created", tablename)
-		}
-		// create user table
-		ctable = fmt.Sprintf("CREATE Table %s(userId int NOT NULL AUTO_INCREMENT, username varchar(50), password varchar(50), role int,PRIMARY KEY (userId));", usertable)
-
-		if dbExec(ctable) {
-			log.Printf("Table %s created", usertable)
-		}
-		// Insert admin user
-		initUser := fmt.Sprintf("INSERT INTO %s (username, password, role) VALUES (\"%s\", \"%s\", 0)", usertable, "admin", "1234")
-
-		if dbExec(initUser) {
-			log.Println("Admin user created")
-		}
+		log.Printf(err.Error())
+		return
 	}
-	http.Redirect(w, r, "/login", http.StatusFound)
+	cdb := fmt.Sprintf("CREATE DATABASE %s;", dbname)
+	log.Println(cdb)
+	_, err = db.Exec(cdb)
+
+	for err != nil {
+		log.Printf("init db failed %s \n", err.Error())
+		log.Printf("Retrying...........")
+		timer1 = time.NewTimer(10 * time.Second)
+		<-timer1.C
+		_, err = db.Exec(cdb)
+	}
+
+	log.Println("Successfully created database")
+
+	udb := fmt.Sprintf("use %s;", dbname)
+	_, err = db.Exec(udb)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
+	log.Printf("Switch to db %s \n", dbname)
+
+	connection = db
+
+	// create product table
+	ctable := fmt.Sprintf("CREATE Table %s(orderId int NOT NULL AUTO_INCREMENT, custId varchar(50), orderName varchar(30), orderState int,PRIMARY KEY (orderId));", tablename)
+	if dbExec(ctable) {
+		log.Printf("Table %s created", tablename)
+	}
+	// create user table
+	ctable = fmt.Sprintf("CREATE Table %s(userId int NOT NULL AUTO_INCREMENT, username varchar(50), password varchar(50), role int,PRIMARY KEY (userId));", usertable)
+
+	if dbExec(ctable) {
+		log.Printf("Table %s created", usertable)
+	}
+	// Insert admin user
+	initUser := fmt.Sprintf("INSERT INTO %s (username, password, role) VALUES (\"%s\", \"%s\", 0)", usertable, "admin", "1234")
+
+	if dbExec(initUser) {
+		log.Println("Admin user created")
+	}
+
 	defer db.Close()
 	connection = nil
 }

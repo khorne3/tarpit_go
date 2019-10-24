@@ -20,8 +20,7 @@ func main() {
 	rtr.HandleFunc("/processOrder", processHandler)
 	rtr.HandleFunc("/getOrderStatus", statusHandler)
 	rtr.HandleFunc("/app", appHandler)
-	rtr.HandleFunc("/init", initHandler)
-	rtr.HandleFunc("/dbinit", dbinitHandler)
+	//rtr.HandleFunc("/dbinit", dbinitHandler)
 	//rtr.HandleFunc("/FileUploader", servicesHandler)
 	rtr.HandleFunc("/vulns", vulnsHandler)
 	rtr.HandleFunc("/profile", proHandler)
@@ -38,5 +37,6 @@ func main() {
 
 	// listen to the web request
 	log.Println("Listening...")
+	dbinit()
 	http.ListenAndServe(":3000", nil)
 }
