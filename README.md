@@ -4,15 +4,8 @@
 cd <tarpit_go>
 docker-compose up
 ```
-2. DB Init:
-Visit:
-http://localhost:3000/init
-or
-```
-curl -X GET http://localhost:3000/dbinit
-```
-3. Visit http://localhost:3000/login to see the demo; (There are also curl commands version attached)
-4. Tear down the environment:
+2. Visit http://localhost:3000/login to see the demo; (There are also curl commands version attached)
+3. Tear down the environment:
 ```
 control + C
 docker-compose down
@@ -33,13 +26,17 @@ curl -X POST -d "cmd=ls -a" http://localhost:3000/exec
 curl -X GET http://localhost:3000/image/../demo/demo.go
 ```
 4. Hard Coded credentials:
+
 [https://github.com/AiolosLiu/tarpit_go/blob/master/auth.go#L19](https://github.com/AiolosLiu/tarpit_go/blob/master/auth.go#L19)
 
-5. Sensitive data leak: 
+5. Sensitive data leak:
+
 [https://github.com/AiolosLiu/tarpit_go/blob/master/auth.go#L26](https://github.com/AiolosLiu/tarpit_go/blob/master/auth.go#L26)
 
 6. Insider attack:
+
 [https://github.com/AiolosLiu/tarpit_go/blob/master/vulns.go#L73](https://github.com/AiolosLiu/tarpit_go/blob/master/vulns.go#L73)
 
 7. Business logic flaw:
+
 [https://github.com/AiolosLiu/tarpit_go/blob/master/workflow.go#L100](https://github.com/AiolosLiu/tarpit_go/blob/master/workflow.go#L100)
