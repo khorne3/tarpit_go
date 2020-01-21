@@ -8,3 +8,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: ./.github/actions/foo
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_REPO: "${{ github.repository }}"
+        GITHUB_SHA: "${{ github.sha }}"
