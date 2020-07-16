@@ -36,6 +36,8 @@ func getConnection() *sql.DB {
 }
 
 
+
+
 func dbExec(sql string) bool {
 	log.Println(sql)
 	connection = getConnection()
